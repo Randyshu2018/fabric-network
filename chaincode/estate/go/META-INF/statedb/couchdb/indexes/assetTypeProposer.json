@@ -1,0 +1,6 @@
+{
+  "index":{"fields":["assetType","proposer"]},
+  "ddoc":"assetTypeProposerDoc", 
+  "name":"assetTypeProposer",
+  "type":"json"
+}
