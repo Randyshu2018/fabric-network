@@ -1,0 +1,115 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+
+  orderer1.ejubc.com:
+    extends:
+      file: base/base.yaml
+      service: orderer-base
+    container_name: orderer1.ejubc.com
+    volumes:
+      - ./genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/ejubc.com/orderers/orderer1.ejubc.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/ejubc.com/orderers/orderer1.ejubc.com/tls:/var/hyperledger/orderer/tls
+      - ./mount/orderer1.ejubc.com:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+    
+  orderer2.ejubc.com:
+    extends:
+      file: base/base.yaml
+      service: orderer-base
+    container_name: orderer2.ejubc.com
+    volumes:
+      - ./genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/ejubc.com/orderers/orderer2.ejubc.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/ejubc.com/orderers/orderer2.ejubc.com/tls:/var/hyperledger/orderer/tls
+      - ./mount/orderer2.ejubc.com:/var/hyperledger/production/orderer
+    ports:
+      - 8050:7050
+    
+  orderer3.ejubc.com:
+    extends:
+      file: base/base.yaml
+      service: orderer-base
+    container_name: orderer3.ejubc.com
+    volumes:
+      - ./genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/ejubc.com/orderers/orderer3.ejubc.com/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/ejubc.com/orderers/orderer3.ejubc.com/tls:/var/hyperledger/orderer/tls
+      - ./mount/orderer3.ejubc.com:/var/hyperledger/production/orderer
+    ports:
+      - 9050:7050
+      
+  peer0.master.ejubc.com:
+    container_name: peer0.master.ejubc.com
+    extends:
+      file:  base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.master.ejubc.com
+      - CORE_PEER_LOCALMSPID=MasterMSP
+      - CORE_PEER_ADDRESS=peer0.master.ejubc.com:7051
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=couchpwd
+    ports:
+      - 7051:7051
+      - 7053:7053
+    volumes:
+      - ./crypto-config/peerOrganizations/master.ejubc.com/peers/peer0.master.ejubc.com/:/etc/hyperledger/crypto/peer
+      - ./mount/peer0.master.ejubc.com/var/hyperledger/production:/var/hyperledger/production
+    depends_on:
+      - couchdb1
+      
+  peer0.merchant.ejubc.com:
+    container_name: peer0.merchant.ejubc.com
+    extends:
+      file:  base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.merchant.ejubc.com
+      - CORE_PEER_LOCALMSPID=MerchantMSP
+      - CORE_PEER_ADDRESS=peer0.merchant.ejubc.com:7051
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=admin
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=couchpwd
+    ports:
+      - 8051:7051
+      - 8053:7053
+    volumes:
+      - ./crypto-config/peerOrganizations/merchant.ejubc.com/peers/peer0.merchant.ejubc.com/:/etc/hyperledger/crypto/peer
+      - ./mount/peer0.merchant.ejubc.com/var/hyperledger/production:/var/hyperledger/production
+    depends_on:
+      - couchdb2
+  
+  couchdb1:
+    container_name: couchdb1
+    image: hyperledger/fabric-couchdb:latest
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=couchpwd
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for ejubc map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "5984:5984"
+   
+  couchdb2:
+    container_name: couchdb2
+    image: hyperledger/fabric-couchdb:latest
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=couchpwd
+    # Comment/Uncomment the port mapping if you want to hide/expose the CouchDB service,
+    # for ejubc map it to utilize Fauxton User Interface in dev environments.
+    ports:
+      - "6984:5984"
+
+  

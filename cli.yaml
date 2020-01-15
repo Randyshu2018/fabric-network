@@ -1,0 +1,37 @@
+version: '2'
+
+services:
+  cli:
+    container_name: cli
+    image: hyperledger/fabric-tools:$IMAGE_TAG
+    tty: true
+    stdin_open: true
+    environment:
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=cli
+      - FABRIC_LOGGING_SPEC=DEBUG
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_LOCALMSPID=MerchantMSP
+      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/merchant.ejubc.com/peers/peer0.merchant.ejubc.com/tls/ca.crt
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/merchant.ejubc.com/users/Admin@merchant.ejubc.com/msp
+      - CORE_PEER_ADDRESS=peer0.merchant.ejubc.com:7051
+#      - CORE_PEER_TLS_CERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/master.ejubc.com/peers/peer0.master.ejubc.com/tls/server.crt
+#      - CORE_PEER_TLS_KEY_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/master.ejubc.com/peers/peer0.master.ejubc.com/tls/server.key
+#      - CORE_PEER_TLS_ROOTCERT_FILE=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/master.ejubc.com/peers/peer0.master.ejubc.com/tls/ca.crt
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+      - /var/run/:/host/var/run/
+      - ./chaincode/:/opt/gopath/src/github.com/chaincode
+      - ./fixtures/crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+      - ./scripts:/opt/gopath/src/github.com/hyperledger/fabric/peer/scripts/
+      - ./fixtures/channel-artifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channel-artifacts
+#    extra_hosts: 
+#      - "orderer1.ejubc.com:10.116.164.10" 
+#      - "orderer2.ejubc.com:10.116.164.19" 
+#      - "orderer3.ejubc.com:10.116.164.20"
+#      - "peer0.master.ejubc.com:10.116.164.10"
+#      - "peer1.master.ejubc.com:10.116.164.19"
+#      - "peer0.merchant.ejubc.com:10.116.164.20"
+#      - "peer1.merchant.ejubc.com:10.116.164.21"
